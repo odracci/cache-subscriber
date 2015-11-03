@@ -270,6 +270,7 @@ class CacheStorage implements CacheStorageInterface
     private function getTtl(ResponseInterface $response)
     {
         $ttl = 0;
+        $maxAge = null;
 
         if ($cacheControl = $response->getHeader('Cache-Control')) {
             $maxAge = Utils::getDirective($response, 'max-age');
@@ -283,7 +284,8 @@ class CacheStorage implements CacheStorageInterface
             if (is_numeric($stale)) {
                 $ttl += $stale;
             }
-        } elseif ($expires = $response->getHeader('Expires')) {
+        }
+        if (!$maxAge && $expires = $response->getHeader('Expires')) {
             $ttl += strtotime($expires) - time();
         }
 
